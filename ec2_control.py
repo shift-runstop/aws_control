@@ -7,46 +7,64 @@ import os
 
 # set-up
 
-os.system('clear')
-
-def create_key_pair():
-    KEY_PAIR_NAME = input('Name of new key: ')
-    ec2=b3.client('ec2')
-    key = ec2.create_key_pair(keyName=KEY_PAIR_NAME)
-    key_file = open(KEY_PAIR_NAME + ".pem", "w")
-    key_file.write(key.key_material)
-    key_file.close()
-
+# os.system('clear')
+ec2 = b3.resource('ec2')
+ec2_client = b3.client('ec2')
 
 def create_ec2():
-    resp = input('do you wish to use the default key (Y/N)') 
-    if resp == 'Y':
+    try:
         key = 'web-server-key-key.pem'
-        ec2_run()
-    elif resp == 'N':
-        key = create_key_pair()
-        ec2_run()
-    else:
-     print('not a valid option')
-     create_ec2()
-
-
-def ec2_run(key):
-    ec2 = b3.resource('ec2')
-    ec2.create_instances(
+        instance = ec2.create_instances(
             ImageId= 'ami-0d1bf5b68307103c2',
             MinCount=1,
             MaxCount=1,
             InstanceType='t2.nano',
-            ecurityGroupIds=['sg-2a07095e4e3fda0c2'],
-            KeyName=key
-    )
-    ec2.wait_until_running()
-    ec2.reload()
+            SecurityGroupIds = [
+                'sg-0feb83198fdf59512'       
+            ],
+            KeyName=key,
 
+            UserData = 
+                    ''' 
+                    #!/bin/bash
+                    sudo apt-get update
+                    sudo yum install httpd -y
+                    sudo systemctl enable httpd 
+                    sudo systemctl start httpd 
+                    echo '<html>' > index.html
+                    echo 'Private IP address: ' >> index.html
+                    curl -s http://169.254.169.254/latest/meta-data/local-ipv4>> index.html
+                    echo 'Public IP address: ' >> index.html 
+                    curl -s http://169.254.169.254/latest/meta-data/public-ipv4 >> index.html
+                    echo 'Instance type: ' >> index.html
+                    curl -s http://169.254.169.254/latest/meta-data/instance-type >> index.html
+                    echo 'Instance ID: ' >> index.html
+                    curl -s http://169.254.169.254/latest/meta-data/instance-id >> index.html
+                    cp index.html /var/www/html/index.html
+                    ''',
+        )
+
+        instance.wait_until_running()
+        ec2.reload()
+        
+    except Exception as error:
+        print('(ノ°Д°）ノ︵ ┻━┻')
+        print(error)
+
+def create_kpc():
+    resp = input('do you wish to use the default key (Y/N)') 
+    if resp == 'Y':
+        key = 'web-server-key-key.pem'
+    elif resp == 'N':
+        KEY_PAIR_NAME = input('Name of new key: ')
+        key = ec2.create_key_pair(keyName=KEY_PAIR_NAME)
+        key_file = open(KEY_PAIR_NAME + ".pem", "w")
+        key_file.write(key.key_material)
+        key_file.close()
+    else:
+     print('not a valid option')
 
 def terminate_ec2():
-    ec2 = b3.resource('ec2')
     for instance_id in sys.argv[1:]:
         instance = ec2.instance(instance_id)
         response = instance.terminate()
@@ -55,7 +73,6 @@ def terminate_ec2():
 
 def list_instances():
     for i in ec2.instances.all():
-        ec2_list = []
         print("Id: {0}\tState: {1}\tLaunched: {2}\tRoot Device Name: {3}".format(
             colored(i.id, 'cyan'),
             colored(i.state['Name'], 'green'),
@@ -127,3 +144,5 @@ def list_instances():
         # print(i.console_output()['Output'])
 
         print("--------------------")
+
+create_ec2()

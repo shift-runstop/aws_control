@@ -4,7 +4,6 @@ import ec2_control
 import s3_control
 
 parser=argparse.ArgumentParser()
-
 # ec2 parsing
 parser.add_argument("-c-ec2","--create-ec2", dest='cec2', help='create an ec2 instance you will be prompted for an ssh key')
 parser.add_argument("-ls-ec2", "--list-ec2", dest='lsec2', help='List all ec2 instances and associated information')
@@ -18,12 +17,12 @@ args=parser.parse_args()
 #argument controls
 def main():
     if args.cec2:
-        ec2_control.create_ec2
+        ec2_control.create_ec2()
     if args.cs3:
-        s3_control.create_s3
+        s3_control.create_s3()
     if args.ls3k:
         s3_control.list_s3_and_keys()
-    if arg.lsec2:
+    if args.lsec2:
         ec2_control.list_instances()
 
 if __name__ == "__main__":
