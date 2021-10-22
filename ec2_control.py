@@ -75,12 +75,12 @@ class ec2:
             print('Running script now')
             subprocess.run("ssh -o StrictHostKeyChecking=no -i web-server-key-key.pem ec2-user@" + ec2_ip + " ' ./monitor.sh'", shell=True)
             
-            print('Opening in browser: ')
+            print('Opening in browser')
             instance[0].reload()
             # ec2_client = b3.client('ec2')
             # waiter = ec2_client.get_waiter('instance_status_ok')
             # waiter.wait(InstanceIds=[instance[0].instance_id])
-            webbrowser.open_new_tab(ec2_ip)
+            webbrowser.open_new_tab('http://'+ec2_ip)
 
         except Exception as e:
             print('Error on monitoring')#
