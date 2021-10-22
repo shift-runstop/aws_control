@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import argparse
-import ec2_control
-import s3_control
+
+from ec2_control import ec2
+from s3_control import s3
 
 parser=argparse.ArgumentParser()
 # ec2 parsing
@@ -17,16 +18,15 @@ args=parser.parse_args()
 #argument controls
 def main():
     if args.cec2:
-        ec2_control.create_ec2()
+        ec2.create_ec2()
     if args.lsec2:
-        ec2_control.list_instances()
+        ec2.list_instances()
     if args.rmec2:
-        ec2_control.terminate_ec2()
+        ec2.terminate_ec2()
     if args.cs3:
-        s3_control.create_s3()
+        s3.create_s3()
     if args.ls3k:
-        s3_control.list_s3_and_keys()
+        s3.list_s3_and_keys()
     
-
 if __name__ == "__main__":
     main()
