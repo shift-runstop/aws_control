@@ -11,13 +11,14 @@ from termcolor import colored
 
 
 class ec2:
-
-    os.system('clear')
-    ec2 = b3.resource('ec2')
     
+    os.system('clear')
+      
     def create_ec2():
         try:
             #key = ec2_client.keyPair('web-server-key-key')
+            ec2 = b3.resource('ec2')
+            print('Creating ec2 instance')
             instance = ec2.create_instances(
                 ImageId= 'ami-0d1bf5b68307103c2',
                 MinCount=1,
@@ -27,12 +28,12 @@ class ec2:
                     'sg-08c878eeead2e48a9'       
                 ],
                 KeyName='web-server-key-key',
-
                 UserData = 
                         ''' 
                         #!/bin/bash
                         sudo apt-get update
-                        sudo yum install httpd -y
+                        sudo yum install -y httpd
+                        sudo yum install -y date
                         sudo systemctl enable httpd 
                         sudo systemctl start httpd 
                         echo '<html>' > index.html
@@ -46,17 +47,17 @@ class ec2:
                         curl -s http://169.254.169.254/latest/meta-data/instance-id >> index.html
                         cp index.html /var/www/html/index.html
                         ''',
-                        TagSpecifications = [
+                TagSpecifications = [
+                    {
+                        'ResourceType': 'instance',
+                        'Tags': [
                             {
-                                'ResourceType': 'instance',
-                                'Tags': [
-                                    {
-                                    'Key': 'Name',
-                                    'Value': 'Assignment Instance'
-                                    }
-                                ]
+                            'Key': 'Name',
+                            'Value': 'Assignment Instance'
                             }
                         ]
+                    }
+                ]
             )
 
             instance[0].wait_until_running()            
@@ -67,26 +68,36 @@ class ec2:
         try:
             instance[0].reload()
             ec2_ip = instance[0].public_ip_address
-
             print('Uploading monitoring')
-            ec2_client = b3.client('ec2')
-            waiter = ec2_client.get_waiter('Loading Files')
-            waiter.wait(InstanceIds=[instance[0].instance_id])
             subprocess.run("scp -o StrictHostKeyChecking=no -i web-server-key-key.pem monitor.sh ec2-user@" + ec2_ip + ":.", shell=True)
             print('Accessing permissions')
             subprocess.run("ssh -o StrictHostKeyChecking=no -i web-server-key-key.pem ec2-user@" + ec2_ip + " 'chmod 700 monitor.sh'", shell=True)
             print('Running script now')
             subprocess.run("ssh -o StrictHostKeyChecking=no -i web-server-key-key.pem ec2-user@" + ec2_ip + " ' ./monitor.sh'", shell=True)
-
+            
             print('Opening in browser: ')
+            instance[0].reload()
+            # ec2_client = b3.client('ec2')
+            # waiter = ec2_client.get_waiter('instance_status_ok')
+            # waiter.wait(InstanceIds=[instance[0].instance_id])
             webbrowser.open_new_tab(ec2_ip)
 
         except Exception as e:
-            print('An error occurred while setting up monitoring.')#
+            print('Error on monitoring')#
             print(e)
 
+        cleanup = input('Clean? (y/n)')
+        if cleanup == 'y':
+            for instance_id in instance[0:]:
+                ec2 = b3.resource('ec2')
+                instance = ec2.instance(instance_id)
+                response = instance.terminate()
+                print(response)
+        else:
+            os._exit(0)
+
     def create_kpc():
-        resp = input('do you wish to use the default key (Y/N)') 
+        resp = input('do you wish to use the default key (y/n)') 
         if resp == 'Y':
             key = 'web-server-key-key.pem'
         elif resp == 'N':
@@ -105,6 +116,7 @@ class ec2:
             print(response)
 
     def list_instances():
+        ec2 = b3.resource('ec2')
         for i in ec2.instances.all():
             print("Id: {0}\tState: {1}\tLaunched: {2}\tRoot Device Name: {3}".format(
                 colored(i.id, 'cyan'),
