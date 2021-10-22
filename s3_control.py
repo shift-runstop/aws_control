@@ -28,7 +28,7 @@ class s3:
             print ('Something bad happened: ',error)
 
         option = input('Static Website Configuration (y/n)')
-        if option =='y' or 'Y':
+        if option =='y':
             try:
                 print('Downloading Files')
                 subprocess.run("curl http://devops.witdemo.net/assign1.jpg > assign1.jpg", shell=True)
