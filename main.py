@@ -12,6 +12,7 @@ parser.add_argument("-rm-ec2", "--remove-ec2", dest='rmec2', help='Terminate ec2
 #s3 parsing
 parser.add_argument("-c-s3","--create-s3", dest='cs3', help='create an s3 bucket, location default is eu-west-1, requires bucket name')
 parser.add_argument("-ls-s3", "--list-s3", dest='ls3k', help='List all s3 buckets')
+parser.add_argument("-rm-s3", "--remove-s3", dest='rms3', help='Remove all files associated with bucket requires bucket name as parameter')
 
 args=parser.parse_args()
 
