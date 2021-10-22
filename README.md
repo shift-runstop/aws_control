@@ -1,13 +1,26 @@
 # AWS control program
 
+## Requirements
+aws-cli
+boto3
+
+## Usage
+
+./main.py --help
+
 ## TODO
 
 - [x] Fix sys.argv parameter bug
-- [] create key pair function **
+- [] ec2 create key pair function **
 - [] s3 bucket populate
-- [] monitor.sh imrove from basic functinallity
+    - remove xml error (nearly there)
+- [] s3 add delete
+- [] s3 add imporoved list
 - [] add finished functions to argparse in main.py
 - [] set up autoload functions
-    -[x] ec2
+    -[] ec2
+        - [x] fix monitor upload
+        - [x] webpage loads
+        - [] add extra shell scripting in monitor.sh
     - [] s3
-- [] add lambda test 
+        * why xml??
