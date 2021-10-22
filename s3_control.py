@@ -15,7 +15,7 @@ class s3:
     def create_s3():
         temp = uuid.uuid1()
         bucket_name=re.sub('-','0',str(temp))
-        
+
         try:
             s3_client = b3.client("s3")
 
@@ -69,7 +69,7 @@ class s3:
                     }
                 )
 
-                print('Opening website')
+                print('Opening in browser')
                 webbrowser.open_new_tab('https://{}.s3.eu-west-1.amazonaws.com/index.html'.format(bucket_name))
                 
                 print('Bucket Success')
