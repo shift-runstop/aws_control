@@ -11,13 +11,14 @@ import webbrowser
 class s3:
 
     s3 = b3.resource("s3")
-    
 
     def create_s3():
         temp = uuid.uuid1()
         bucket_name=re.sub('-','0',str(temp))
+        
         try:
             s3_client = b3.client("s3")
+
             bucket = s3_client.create_bucket(Bucket=bucket_name,
             CreateBucketConfiguration={'LocationConstraint': 'eu-west-1'},
             ACL='public-read'
@@ -33,21 +34,23 @@ class s3:
                 print('Downloading Files')
                 subprocess.run("curl http://devops.witdemo.net/assign1.jpg > assign1.jpg", shell=True)
                 subprocess.run("touch index.html", shell=True)
-                object = 'index.html'
+                
+                htmlObject = 'index.html'
                 print('Sending index.html to bucket')
-                s3.Object(bucket_name, object).put(
+                s3.Object(bucket_name, htmlObject).put(
                     Body=open(object, 'rb'), 
                     ContentType='text/html',
                     ACL='public-read'
                 )
 
-                object = 'assign1.jpg'
+                jpgObject = 'assign1.jpg'
                 print('Sending image to bucket')
-                s3.Object(bucket_name, object).put(
+                s3.Object(bucket_name, jpgObject).put(
                     Body=open(object, 'rb'), 
                     ContentType='image/jpeg',
                     ACL='public-read'
                 )
+
                 print('Writing to file')
                 subprocess.run("echo '<img src=https://{}.s3.eu-west-1.amazonaws.com/assign1.jpg>'> index.html".format(bucket_name), shell=True) 
                 print('Image has been attached to page')
@@ -56,31 +59,30 @@ class s3:
                 print('Bucket Broken, please fix: ',error)
 
             try:
-                website_configuration = {
-                    'ErrorDocument': {'Key': 'error.html'},
-                    'IndexDocument': {'Suffix': 'index.html'},
-                }
+                
                 s3_client = b3.client("s3")
                 s3_client.put_bucket_website(
                     Bucket=bucket_name, 
-                    WebsiteConfiguration=website_configuration,
+                    WebsiteConfiguration={
+                        'ErrorDocument': {'Key': 'error.html'},
+                        'IndexDocument': {'Suffix': 'index.html'},
+                    }
                 )
+
                 print('Opening website')
                 webbrowser.open_new_tab('https://{}.s3.eu-west-1.amazonaws.com/index.html'.format(bucket_name))
+                
                 print('Bucket Success')
 
-            except Exception as e:
+            except Exception as error:
                 print('Bucket Broke again')
-                print(e)
+                print(error)
         else:
             os._exit(0)
             
-        
-        
-
-
 
     def list_s3_and_keys():
+        s3 = b3.resource("s3")
         for bucket in s3.buckets.all():
             print(bucket.name)
             print ('---')
