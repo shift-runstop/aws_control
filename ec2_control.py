@@ -33,7 +33,6 @@ class ec2:
                         #!/bin/bash
                         sudo apt-get update
                         sudo yum install -y httpd
-                        sudo yum install -y date
                         sudo systemctl enable httpd 
                         sudo systemctl start httpd 
                         echo '<html>' > index.html
@@ -86,28 +85,16 @@ class ec2:
             print('Error on monitoring')#
             print(e)
 
-        cleanup = input('Clean? (y/n)')
-        if cleanup == 'y':
-            for instance_id in instance[0:]:
-                ec2 = b3.resource('ec2')
-                instance = ec2.instance(instance_id)
-                response = instance.terminate()
-                print(response)
-        else:
-            os._exit(0)
-
-    def create_kpc():
-        resp = input('do you wish to use the default key (y/n)') 
-        if resp == 'Y':
-            key = 'web-server-key-key.pem'
-        elif resp == 'N':
+    def create_kp():
+        ec2 = b3.resource('ec2')
+        try:
             KEY_PAIR_NAME = input('Name of new key: ')
-            key = ec2.create_key_pair(keyName=KEY_PAIR_NAME)
+            key = ec2.create_key_pair(KeyName=KEY_PAIR_NAME)
             key_file = open(KEY_PAIR_NAME + ".pem", "w")
             key_file.write(key.key_material)
             key_file.close()
-        else:
-            print('not a valid option')
+        except Exception as error:
+            print('key pair creation error: ', error)
 
     def terminate_ec2():
         ec2 = b3.resource('ec2')
@@ -117,9 +104,9 @@ class ec2:
                     inst.terminate()
                     print('Instance', inst.instance_id, 'deleted.')
 
-        except Exception as e:
+        except Exception as error:
             print('Error deleting instances')
-            print(e)
+            print(error)
         print('No more instances to delete')
 
     def list_instances():
