@@ -11,8 +11,8 @@ parser.add_argument("-ls-ec2", "--list-ec2", dest='lsec2', help='List all ec2 in
 parser.add_argument("-rm-ec2", "--remove-ec2", dest='rmec2', help='Terminate ec2 instance by specifying instance id by passing the id as an argument')
 #s3 parsing
 parser.add_argument("-c-s3","--create-s3", dest='cs3', help='create an s3 bucket, location default is eu-west-1, requires bucket name')
-parser.add_argument("-ls-s3", "--list-s3", dest='ls3k', help='List all s3 buckets')
-parser.add_argument("-rm-s3", "--remove-s3", dest='rms3', help='Remove all files associated with bucket requires bucket name as parameter')
+parser.add_argument("-ls-s3", "--list-s3", dest='ls3', help='List all s3 buckets')
+parser.add_argument("-rm-s3", "--remove-s3", dest='rms3', help='Empties and deletes all running buckets')
 
 args=parser.parse_args()
 
@@ -26,8 +26,10 @@ def main():
         ec2.terminate_ec2()
     if args.cs3:
         s3.create_s3()
-    if args.ls3k:
-        s3.list_s3_and_keys()
+    if args.ls3:
+        s3.list_s3()
+    if args.rms3:
+        s3.delete_buckets
     
 if __name__ == "__main__":
     main()
