@@ -110,12 +110,20 @@ class ec2:
             print('not a valid option')
 
     def terminate_ec2():
-        for instance_id in sys.argv[1]:
-            instance = ec2.instance(instance_id)
-            response = instance.terminate()
-            print(response)
+        ec2 = b3.resource('ec2')
+        try:
+            for inst in ec2.instances.all():
+                if inst.state['Name'] != 'terminated':
+                    inst.terminate()
+                    print('Instance', inst.instance_id, 'deleted.')
+
+        except Exception as e:
+            print('Error deleting instances')
+            print(e)
+        print('No more instances to delete')
 
     def list_instances():
+        # https://github.com/suhaibchishti/sample_scripts/blob/master/aws_list_ec2.py
         ec2 = b3.resource('ec2')
         for i in ec2.instances.all():
             print("Id: {0}\tState: {1}\tLaunched: {2}\tRoot Device Name: {3}".format(
@@ -185,5 +193,5 @@ class ec2:
                 ))
 
             print("Console Output:")
-            # print(i.console_output()['Output'])
+
             print("--------------------")
