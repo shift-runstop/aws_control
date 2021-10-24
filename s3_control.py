@@ -103,7 +103,7 @@ class s3:
                 s3_bucket.delete()
                 print(s3_bucket, ' deleted')
 
-        except Exception as e:
+        except Exception as error:
             print('No buckets to delete!')
-            print(e)
+            print(error)
         print('No more buckets to delete')
