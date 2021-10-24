@@ -15,18 +15,14 @@ HTTPD_PROCESSES=$(ps -A | grep -c httpd)
 PROC=$(uname -p)
 KERNEL=$(uname -svr)
 ARCH=$(uname -m)
-echo '<----------------->'
-echo 'Instance running at:'
-echo $(date +%d)/$(date +%m)/$(date +%y) $(date +"%T")
+echo "<----------------->"
+echo "Instance running at: $(date +%d)/$(date +%m)/$(date +%y) $(date +"%T")"
 echo "Processor:  $PROC"
 echo "Kernel Version: $KERNEL"
 echo "Architecture: $ARCH"
 echo "Instance ID: $INSTANCE_ID"
 echo "Memory utilisation: $MEMORYUSAGE"
 echo "No of processes: $PROCESSES"
-
-
-
 
 if [ $HTTPD_PROCESSES -ge 1 ]
 then
