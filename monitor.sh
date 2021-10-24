@@ -12,9 +12,15 @@ INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
 MEMORYUSAGE=$(free -m | awk 'NR==2{printf "%.2f%%", $3*100/$2 }')
 PROCESSES=$(expr $(ps -A | grep -c .) - 1)
 HTTPD_PROCESSES=$(ps -A | grep -c httpd)
-#TIME=$(date +%d)/$(date +%m)/$(date +%y) $(date +"%T")
-
-#echo ": $TIME"
+PROC=$(uname -p)
+KERNEL=$(uname -svr)
+ARCH=$(uname -m)
+echo '<----------------->'
+echo 'Instance running at:'
+echo $(date +%d)/$(date +%m)/$(date +%y) $(date +"%T")
+echo "Processor:  $PROC"
+echo "Kernel Version: $KERNEL"
+echo "Architecture: $ARCH"
 echo "Instance ID: $INSTANCE_ID"
 echo "Memory utilisation: $MEMORYUSAGE"
 echo "No of processes: $PROCESSES"
@@ -29,3 +35,4 @@ else
     echo "Web server is NOT running"
 fi
 
+echo '<----------------->'
