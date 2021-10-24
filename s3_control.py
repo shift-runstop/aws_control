@@ -81,21 +81,29 @@ class s3:
             os._exit(0)
             
 
-    def list_s3_and_keys():
+    def list_s3():
         s3 = b3.resource("s3")
         for bucket in s3.buckets.all():
             print(bucket.name)
-            print ('---')
+            print ('----------')
             for item in bucket.objects.all():
                 print("\t%s" % item.key)
 
-    def delete_bucket_contents():
+    def delete_buckets():
+        try:
+            s3_client = b3.client('s3')
+            s3 = b3.resource('s3')
 
-        for bucket_name in sys.argv[1:]:
-            bucket = s3.Bucket(bucket_name)
-            for key in bucket.objects.all():
-                try:
-                    response = key.delete()
-                    print (response)
-                except Exception as error:
-                    print (error)
+            buckets = s3_client.list_buckets()
+
+            for bucket in buckets['Buckets']:
+                s3_bucket = s3.Bucket(bucket['Name'])
+                s3_bucket.objects.all().delete()
+                print(s3_bucket, ' emptied')
+                s3_bucket.delete()
+                print(s3_bucket, ' deleted')
+
+        except Exception as e:
+            print('No buckets to delete!')
+            print(e)
+        print('No more buckets to delete')
