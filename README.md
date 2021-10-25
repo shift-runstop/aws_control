@@ -1,5 +1,9 @@
 # AWS control program
 
+For College DevOps assignment, Hits required specs.
+Highly extensible. 
+Needs more lambdas
+
 ## Requirements
 aws-cli
 boto3
@@ -11,16 +15,18 @@ boto3
 ## TODO
 
 - [x] Fix sys.argv parameter bug
-- [] ec2 create key pair function **
-- [] s3 bucket populate
+- [x] ec2 create key pair function **
+- [x] s3 bucket populate
     - remove xml error (nearly there)
-- [] s3 add delete
+- [x] s3 add delete
 - [] s3 add imporoved list
-- [] add finished functions to argparse in main.py
-- [] set up autoload functions
-    -[] ec2
+- [x] add finished functions to argparse in main.py
+- [x] set up autoload functions
+    -[x] ec2
         - [x] fix monitor upload
         - [x] webpage loads
-        - [] add extra shell scripting in monitor.sh
-    - [] s3
-        * why xml??
+        - [x] add extra shell scripting in monitor.sh
+    - [x] s3
+        - [x] fix XML
+        - [x] static website config
+        - [x] jpeg attached
