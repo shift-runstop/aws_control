@@ -19,7 +19,7 @@ args=parser.parse_args()
 
 #argument controls
 def main():
-    
+
     os.system('clear')
 
     if args.cec2:
@@ -35,7 +35,7 @@ def main():
     if args.ls3:
         s3.list_s3()
     if args.rms3:
-        s3.delete_buckets
+        s3.delete_buckets()
     
 if __name__ == "__main__":
     main()
