@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/usr/bin/bash
 #
 # Some extended monitoring functionality; Tested on Amazon Linux 2
 #                        _ _             
