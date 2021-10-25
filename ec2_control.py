@@ -52,14 +52,15 @@ class ec2:
                         'Tags': [
                             {
                             'Key': 'Name',
-                            'Value': 'Assignment Instance'
+                            'Value': 'Assignment Web Server Instance'
                             }
                         ]
                     }
                 ]
             )
 
-            instance[0].wait_until_running()            
+            instance[0].wait_until_running()
+            print('Instance Created')          
         except Exception as error:
             print('(ノ°Д°）ノ︵ ┻━┻')
             print(error)
@@ -69,16 +70,16 @@ class ec2:
             instance[0].reload()
             instance[0].wait_until_running()
             ec2_ip = instance[0].public_ip_address
-            waiter = ec2_client.get_waiter('instance_status_ok')
-            waiter.wait(InstanceIds=[instance[0].instance_id])
+            # waiter = ec2_client.get_waiter('instance_status_ok')
+            # waiter.wait(InstanceIds=[instance[0].instance_id])
             try:
                 print('Uploading monitoring')
-                subprocess.run("scp -o StrictHostKeyChecking=no -i web-server-key-key.pem monitor.sh ec2-user@" + ec2_ip + ":.", shell=True)
+                subprocess.run("scp -v -o StrictHostKeyChecking=no -i web-server-key-key.pem monitor.sh ec2-user@" + ec2_ip + ":~", shell=True)
             except Exception as error:
                 print('Error uploading script ', error)
             try:
                 print('Accessing permissions')
-                subprocess.run("ssh -o StrictHostKeyChecking=no -i web-server-key-key.pem ec2-user@" + ec2_ip + " chmod +x monitor.sh", shell=True)
+                subprocess.run("ssh -o StrictHostKeyChecking=no -i web-server-key-key.pem ec2-user@" + ec2_ip + " 'chmod +x ~/monitor.sh'", shell=True)
             except Exception as error:
                 print('Error making sscript executable ', error)
             try:
