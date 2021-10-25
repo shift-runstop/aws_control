@@ -16,6 +16,8 @@ class s3:
         temp = uuid.uuid1()
         bucket_name=re.sub('-','0',str(temp))
 
+        # Create
+
         try:
             s3_client = b3.client("s3")
 
@@ -28,57 +30,60 @@ class s3:
         except Exception as error:
             print ('Something bad happened: ',error)
 
-        option = input('Static Website Configuration (y/n)')
-        if option =='y':
-            try:
-                print('Downloading Files')
-                subprocess.run("curl http://devops.witdemo.net/assign1.jpg > assign1.jpg", shell=True)
-                subprocess.run("touch index.html", shell=True)
-                
-                htmlObject = 'index.html'
-                print('Sending index.html to bucket')
-                s3.Object(bucket_name, htmlObject).put(
-                    Body=open(object, 'rb'), 
-                    ContentType='text/html',
-                    ACL='public-read'
-                )
+        # Convert
 
-                jpgObject = 'assign1.jpg'
-                print('Sending image to bucket')
-                s3.Object(bucket_name, jpgObject).put(
-                    Body=open(object, 'rb'), 
-                    ContentType='image/jpeg',
-                    ACL='public-read'
-                )
+        try:
+            
+            s3_client = b3.client("s3")
+            s3_client.put_bucket_website(
+                Bucket=bucket_name, 
+                WebsiteConfiguration={
+                    'ErrorDocument': {'Key': 'error.html'},
+                    'IndexDocument': {'Suffix': 'index.html'},
+                }
+            )
 
-                print('Writing to file')
-                subprocess.run("echo '<img src=https://{}.s3.eu-west-1.amazonaws.com/assign1.jpg>'> index.html".format(bucket_name), shell=True) 
-                print('Image has been attached to page')
-                
-            except Exception as error:
-                print('Bucket Broken, please fix: ',error)
+            print('Opening in browser')
+            webbrowser.open_new_tab('https://{}.s3.eu-west-1.amazonaws.com/index.html'.format(bucket_name))
+            
+            print('Bucket Success')
 
-            try:
-                
-                s3_client = b3.client("s3")
-                s3_client.put_bucket_website(
-                    Bucket=bucket_name, 
-                    WebsiteConfiguration={
-                        'ErrorDocument': {'Key': 'error.html'},
-                        'IndexDocument': {'Suffix': 'index.html'},
-                    }
-                )
+        except Exception as error:
+            print('Bucket Broke again')
+            print(error)
 
-                print('Opening in browser')
-                webbrowser.open_new_tab('https://{}.s3.eu-west-1.amazonaws.com/index.html'.format(bucket_name))
-                
-                print('Bucket Success')
+        # Send
 
-            except Exception as error:
-                print('Bucket Broke again')
-                print(error)
-        else:
-            os._exit(0)
+        try:
+            s3 = b3.resource("s3")
+            print('Downloading Files')
+            subprocess.run("curl http://devops.witdemo.net/assign1.jpg > assign1.jpg", shell=True)
+            subprocess.run("touch index.html", shell=True)
+
+            print('Writing to file')
+            subprocess.run("echo '<img src=https://{}.s3.eu-west-1.amazonaws.com/assign1.jpg>'> index.html".format(bucket_name), shell=True)
+
+            htmlObject = 'index.html'
+            print('Sending index.html to bucket')
+            s3.Object(bucket_name, htmlObject).put(
+                Body=open(htmlObject, 'rb'), 
+                ContentType='text/html',
+                ACL='public-read'
+            )
+
+            jpgObject = 'assign1.jpg'
+            print('Sending image to bucket')
+            s3.Object(bucket_name, jpgObject).put(
+                Body=open(jpgObject, 'rb'), 
+                ContentType='image/jpeg',
+                ACL='public-read'
+            )
+ 
+            print('Image has been attached to page')
+            
+        except Exception as error:
+            print('Bucket Broken, please fix: ',error)
+
             
 
     def list_s3():
