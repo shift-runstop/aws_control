@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
 
 import boto3 as b3
-import sys
 import os
 import subprocess
 import webbrowser
-import time
 
 from termcolor import colored
 
 
 class ec2:
-    
-    os.system('clear')
       
     def create_ec2():
         try:
