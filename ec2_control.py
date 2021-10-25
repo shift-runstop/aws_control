@@ -31,7 +31,7 @@ class ec2:
                 UserData = 
                         ''' 
                         #!/bin/bash
-                        sudo apt-get update
+                        sudo yum update
                         sudo yum install -y httpd
                         sudo systemctl enable httpd 
                         sudo systemctl start httpd 
@@ -65,15 +65,27 @@ class ec2:
             print(error)
 
         try:
+            ec2_client = b3.client('ec2')
             instance[0].reload()
+            instance[0].wait_until_running()
             ec2_ip = instance[0].public_ip_address
-            print('Uploading monitoring')
-            subprocess.run("scp -o StrictHostKeyChecking=no -i web-server-key-key.pem monitor.sh ec2-user@" + ec2_ip + ":.", shell=True)
-            print('Accessing permissions')
-            subprocess.run("ssh -o StrictHostKeyChecking=no -i web-server-key-key.pem ec2-user@" + ec2_ip + " 'chmod 700 monitor.sh'", shell=True)
-            print('Running script now')
-            subprocess.run("ssh -o StrictHostKeyChecking=no -i web-server-key-key.pem ec2-user@" + ec2_ip + " ' ./monitor.sh'", shell=True)
-            
+            waiter = ec2_client.get_waiter('instance_status_ok')
+            waiter.wait(InstanceIds=[instance[0].instance_id])
+            try:
+                print('Uploading monitoring')
+                subprocess.run("scp -o StrictHostKeyChecking=no -i web-server-key-key.pem monitor.sh ec2-user@" + ec2_ip + ":.", shell=True)
+            except Exception as error:
+                print('Error uploading script ', error)
+            try:
+                print('Accessing permissions')
+                subprocess.run("ssh -o StrictHostKeyChecking=no -i web-server-key-key.pem ec2-user@" + ec2_ip + " chmod +x monitor.sh", shell=True)
+            except Exception as error:
+                print('Error making sscript executable ', error)
+            try:
+                print('Running script now')
+                subprocess.run("ssh -o StrictHostKeyChecking=no -i web-server-key-key.pem ec2-user@" + ec2_ip + " ./monitor.sh", shell=True)
+            except Exception as error:
+                print('Cannot run script ', error)
             print('Opening in browser')
             instance[0].reload()
             # ec2_client = b3.client('ec2')
