@@ -62,9 +62,7 @@ class ec2:
             print(error)
 
         try:
-            ec2_client = b3.client('ec2')
             instance[0].reload()
-            instance[0].wait_until_running()
             ec2_ip = instance[0].public_ip_address
             # waiter = ec2_client.get_waiter('instance_status_ok')
             # waiter.wait(InstanceIds=[instance[0].instance_id])
