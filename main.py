@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import argparse
-
+import os
 from ec2_control import ec2
 from s3_control import s3
 
@@ -19,6 +19,9 @@ args=parser.parse_args()
 
 #argument controls
 def main():
+    
+    os.system('clear')
+
     if args.cec2:
         ec2.create_ec2()
     if args.lsec2:
